@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JanSetu AI — उत्तर प्रदेश परिवार पहचान पत्र एवं नागरिक सेवा सहायक</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Global Header -->
+    <header class="top-nav">
+      <div class="nav-brand">
+        <div class="emblem-badge">🇮🇳</div>
+        <div>
+          <h1>JanSetu AI <span class="tag">UP Family ID (एक परिवार, एक पहचान) Edition</span></h1>
+          <p class="subtitle">4 करोड़ परिवारों व 32 विभागों की 98 योजनाओं हेतु प्रोएक्टिव बहुभाषी सहायक (AI Kaushal Hackathon)</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <!-- Family ID Lookup Input in Header -->
+        <div class="family-search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="familyIdInput" placeholder="Family ID / राशन कार्ड दर्ज करें..." value="24018291024">
+          <button class="btn btn-primary" onclick="lookupActiveFamily()">पहचानें (Search)</button>
+        </div>
+        <button id="resetSessionBtn" class="btn btn-secondary" onclick="resetSession()">🔄 रीसेट</button>
+      </div>
+    </header>
+
+    <!-- Main Split Screen -->
+    <div class="split-layout">
+
+      <!-- LEFT: WhatsApp Citizen Interface -->
+      <section class="pane left-pane whatsapp-screen">
+        <div class="screen-header whatsapp-header">
+          <div class="wa-avatar">🏛️</div>
+          <div class="wa-info">
+            <h3>जनसेतु — एक परिवार एक पहचान (UP Govt Assistant)</h3>
+            <span id="waStatusText" class="wa-status">सक्रिय • अवधी / भोजपुरी / उर्दू / हिंदी संवाद</span>
+          </div>
+          <div class="wa-icons">
+            <span title="सुरक्षित एवं ई-डिस्ट्रिक्ट अधिकृत">🔒</span>
+          </div>
+        </div>
+
+        <!-- Quick 1-Click Family & Flow Presets for Evaluators -->
+        <div class="demo-pills-bar">
+          <span class="demo-label">त्वरित डेमो (1-Click Test Scenarios):</span>
+          <button class="pill-btn highlight" onclick="loadFamilyPreset('24018291024')">👨‍👩‍👧‍👦 24018291024 (रामेश्वर परिवार - ₹23k लाभ)</button>
+          <button class="pill-btn highlight" onclick="loadFamilyPreset('24089123441')">🧵 24089123441 (कल्लू अंसारी - बुनकर सब्सिडी)</button>
+          <button class="pill-btn warn" onclick="presetHandwrittenDoc()">✍️ हस्तलिखित आय प्रमाण (Scan OCR)</button>
+          <button class="pill-btn success" onclick="triggerOneClickFiling()">🏛️ एक-क्लिक आवेदन जमा (File Now)</button>
+        </div>
+
+        <!-- Messages Chat Area -->
+        <div id="chatMessages" class="chat-messages">
+          <div class="message-row incoming">
+            <div class="bubble">
+              <p>राम-राम! जनसेतु एआई में आपका स्वागत है। 🙏</p>
+              <p>उत्तर प्रदेश सरकार के <b>परिवार पहचान पत्र (Family ID)</b> के माध्यम से हम आपके पूरे परिवार की पात्रता स्वतः जांच कर सभी योजनाओं का एकमुश्त आवेदन दाखिल कर सकते हैं।</p>
+              <p class="sub-hint">ऊपर दिए गए फैमिली आईडी बटनों पर क्लिक करें या बोलकर बताएं।</p>
+              <span class="msg-time">अभी</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Input Bar -->
+        <div class="chat-input-bar">
+          <input type="file" id="docUploadInput" accept="image/*" style="display: none;" onchange="handleDocUpload(event)">
+          <button class="icon-btn" title="दस्तावेज़ / हस्तलिखित प्रमाण पत्र अपलोड करें" onclick="document.getElementById('docUploadInput').click()">
+            📎
+          </button>
+          
+          <div class="input-wrapper">
+            <input type="text" id="userInput" placeholder="यहाँ अपनी बात लिखें या माइक दबाकर बोलें..." onkeydown="handleInputKey(event)">
+          </div>
+
+          <button id="recordBtn" class="icon-btn record-btn" title="बोलने के लिए दबाएं" onclick="toggleRecording()">
+            🎙️
+          </button>
+          
+          <button id="sendBtn" class="icon-btn send-btn" title="संदेश भेजें" onclick="sendTextMessage()">
+            ➤
+          </button>
+        </div>
+        <div id="recordingIndicator" class="recording-indicator" style="display: none;">
+          <span class="rec-dot"></span> आवाज रिकॉर्ड हो रही है... (बोलना पूरा होने पर दोबारा माइक दबाएं)
+        </div>
+      </section>
+
+      <!-- RIGHT: AI Inspector & Proactive Telemetry -->
+      <section class="pane right-pane inspector-screen">
+        <div class="screen-header inspector-header">
+          <div>
+            <h3>🛠️ AI Inspector: Family ID & 98 Schemes Engine</h3>
+            <span class="sub-text">Under-the-Hood Proactive Entitlement & DPI Filing Pipeline</span>
+          </div>
+          <span class="badge-tag">Family ID DPI Integrated</span>
+        </div>
+
+        <div class="inspector-content">
+
+          <!-- 1. Family Household Profile -->
+          <div class="telemetry-card">
+            <div class="card-title">
+              <span>👨‍👩‍👧‍👦 Family ID Household Unit (सत्यापित परिवार विवरण)</span>
+              <span id="familyIdBadge" class="metric-badge success">FID: 24018291024</span>
+            </div>
+            <div class="card-body">
+              <div id="familyHeadSummary" class="norm-text" style="margin-bottom: 8px;">
+                <strong>मुखिया:</strong> रामेश्वर प्रसाद • <strong>जनपद:</strong> वाराणसी • <strong>वार्षिक आय:</strong> ₹42,000 • <strong>भूमि:</strong> 1.1 एकड़
+              </div>
+              <div id="membersList" class="members-grid">
+                <!-- Injected via app.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Proactive Scheme Discovery Basket -->
+          <div class="telemetry-card">
+            <div class="card-title">
+              <span>🎯 Proactive Multi-Scheme Discovery (पात्र योजनाओं का बास्केट)</span>
+              <span id="basketTotalBadge" class="metric-badge warn">सालाना लाभ: ₹23,000</span>
+            </div>
+            <div class="card-body">
+              <div id="schemesBasketList" class="schemes-basket-list">
+                <!-- Injected via app.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Handwriting & Scan OCR Guard -->
+          <div class="telemetry-card">
+            <div class="card-title">
+              <span>✍️ Scanned / Handwritten Document Intelligence</span>
+              <span id="scanStatusBadge" class="metric-badge info">प्रतीक्षारत</span>
+            </div>
+            <div class="card-body">
+              <div id="scanInspectionBox" class="norm-text">
+                हस्तलिखित खतौनी, ग्राम प्रधान संस्तुति या उर्दू बुनकर कार्ड की स्थिति यहाँ दिखेगी।
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Official e-District Filing & SLA Telemetry -->
+          <div class="telemetry-card">
+            <div class="card-title">
+              <span>🏛️ e-District Filing & SLA Guarantee (जनहित गारंटी अधिनियम)</span>
+              <span id="filingStatusBadge" class="metric-badge">रेडी टू फाइल</span>
+            </div>
+            <div class="card-body">
+              <div id="filingTelemetryBox" class="norm-text" style="border-left-color: #10B981;">
+                आवेदन एक-क्लिक में जमा होने पर आधिकारिक पावती संख्या, QR कोड व 15-दिवसीय SLA रसीद प्राप्त होगी।
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
