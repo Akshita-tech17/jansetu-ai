@@ -26,8 +26,18 @@ FONTS_DIR = Path(__file__).resolve().parent.parent / "data" / "fonts"
 OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
 FONT_PATH = FONTS_DIR / "NotoSansDevanagari-Regular.ttf"
-FONT_NAME = "Devanagari" if FONT_PATH.exists() else "Helvetica"
-BOLD_FONT = "Devanagari" if FONT_PATH.exists() else "Helvetica-Bold"
+FONT_NAME = "Helvetica"
+BOLD_FONT = "Helvetica-Bold"
+
+if FONT_PATH.exists():
+    try:
+        from reportlab.pdfbase.pdfmetrics import registerFontFamily
+        pdfmetrics.registerFont(TTFont("Devanagari", str(FONT_PATH)))
+        registerFontFamily("Devanagari", normal="Devanagari", bold="Devanagari", italic="Devanagari", boldItalic="Devanagari")
+        FONT_NAME = "Devanagari"
+        BOLD_FONT = "Devanagari"
+    except Exception as e:
+        print(f"[Font Warning] Could not register Devanagari font: {e}")
 
 
 def file_applications_and_generate_receipt(

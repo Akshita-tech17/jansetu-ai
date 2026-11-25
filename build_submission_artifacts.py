@@ -31,19 +31,19 @@ SUBMISSION_DIR = BASE_DIR / "JanSetu_AI_Submission"
 SUBMISSION_DIR.mkdir(parents=True, exist_ok=True)
 FONTS_DIR = BASE_DIR / "data" / "fonts"
 
-FONT_PATH = FONTS_DIR / "NotoSansDevanagari-Regular.ttf"
+# Use robust Windows system fonts to ensure crystal-clear rendering with zero tofu boxes (□)
 FONT_NAME = "Helvetica"
 BOLD_FONT = "Helvetica-Bold"
 
-if FONT_PATH.exists():
-    try:
-        from reportlab.pdfbase.pdfmetrics import registerFontFamily
-        pdfmetrics.registerFont(TTFont("Devanagari", str(FONT_PATH)))
-        registerFontFamily("Devanagari", normal="Devanagari", bold="Devanagari", italic="Devanagari", boldItalic="Devanagari")
-        FONT_NAME = "Devanagari"
-        BOLD_FONT = "Devanagari"
-    except Exception as e:
-        print(f"[Font Warning] Could not register font: {e}")
+try:
+    from reportlab.pdfbase.pdfmetrics import registerFontFamily
+    pdfmetrics.registerFont(TTFont("Arial", "C:/Windows/Fonts/arial.ttf"))
+    pdfmetrics.registerFont(TTFont("Arial-Bold", "C:/Windows/Fonts/arialbd.ttf"))
+    registerFontFamily("Arial", normal="Arial", bold="Arial-Bold", italic="Arial", boldItalic="Arial-Bold")
+    FONT_NAME = "Arial"
+    BOLD_FONT = "Arial-Bold"
+except Exception as e:
+    print(f"[Font Warning] Could not register Arial: {e}")
 
 
 # -------------------------------------------------------------
@@ -250,12 +250,18 @@ def build_architecture_image(output_path: str):
     draw.rectangle([(0, 0), (w, 110)], fill=(30, 41, 59))
     draw.line([(0, 110), (w, 110)], fill=(51, 65, 85), width=2)
 
+    # Load crystal-clear Windows TrueType typography
     try:
-        font_large = ImageFont.truetype(str(FONT_PATH), 36)
-        font_med = ImageFont.truetype(str(FONT_PATH), 22)
-        font_small = ImageFont.truetype(str(FONT_PATH), 17)
+        font_large = ImageFont.truetype("C:/Windows/Fonts/segoeuib.ttf", 34)
+        font_med = ImageFont.truetype("C:/Windows/Fonts/segoeuib.ttf", 20)
+        font_small = ImageFont.truetype("C:/Windows/Fonts/segoeui.ttf", 16)
     except:
-        font_large = font_med = font_small = ImageFont.load_default()
+        try:
+            font_large = ImageFont.truetype("C:/Windows/Fonts/arialbd.ttf", 34)
+            font_med = ImageFont.truetype("C:/Windows/Fonts/arialbd.ttf", 20)
+            font_small = ImageFont.truetype("C:/Windows/Fonts/arial.ttf", 16)
+        except:
+            font_large = font_med = font_small = ImageFont.load_default()
 
     draw.text((60, 25), "JanSetu AI — System Architecture & Data Flow", fill=(248, 250, 252), font=font_large)
     draw.text((60, 72), "AI Kaushal Hackathon • UP Family ID (एक परिवार, एक पहचान) Last-Mile Engine", fill=(56, 189, 248), font=font_small)
@@ -384,44 +390,44 @@ def build_architecture_image(output_path: str):
 def make_submission_bundle():
     print("Building Hackathon Submission Deliverables...")
 
-    # 1. Pitch Deck PDF
-    deck_pdf = SUBMISSION_DIR / "01_JanSetu_AI_Pitch_Deck.pdf"
-    build_pitch_deck_pdf(str(deck_pdf))
+    # 1. Solution Brief PDF (Main Document)
+    brief_pdf = SUBMISSION_DIR / "01_JanSetu_AI_Solution_Brief.pdf"
+    build_pitch_deck_pdf(str(brief_pdf))
 
     # 2. Architecture PNG
     arch_png = SUBMISSION_DIR / "02_System_Architecture.png"
     build_architecture_image(str(arch_png))
 
-    # 3. Sample Pre-Filled PDF
-    sample_pdf = SUBMISSION_DIR / "04_Sample_PreFilled_Form.pdf"
+    # 3. Sample Official Receipt PDF
+    sample_pdf = SUBMISSION_DIR / "04_Sample_Official_eDistrict_Receipt.pdf"
     prof = lookup_family("24018291024")
     basket = discover_schemes_for_family(prof)
     file_applications_and_generate_receipt(prof, basket.matched_schemes, output_path=str(sample_pdf))
     print(f"Generated Sample Form PDF at: {sample_pdf}")
 
-    # 4. Instructions & Readme
-    readme_txt = SUBMISSION_DIR / "README_Submission.txt"
-    readme_txt.write_text(f"""JanSetu AI — Submission Bundle
-Event: AI Kaushal Hackathon (IIIT Lucknow)
-GitHub Repository: https://github.com/Akshita-tech17/jansetu-ai
-
-Contents of this Package:
-1. 01_JanSetu_AI_Pitch_Deck.pdf — 5-slide visual pitch deck (Problem, Solution, Architecture, DPI Impact).
-2. 02_System_Architecture.png — High-resolution architecture diagram.
-3. 03_PoC_Demo.mp4 — (Attach your 60-90s screen recording here or view via GitHub/Drive).
-4. 04_Sample_PreFilled_Form.pdf — Real official e-District submission acknowledgment receipt.
-
-Live Local Run Instructions:
-1. Clone: git clone https://github.com/Akshita-tech17/jansetu-ai
-2. cd jansetu-ai && run.bat
-3. Open http://localhost:8000
-""", encoding="utf-8")
+    # 4. Populate diagrams_and_test_assets subfolder
+    assets_dir = SUBMISSION_DIR / "diagrams_and_test_assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy(str(arch_png), str(assets_dir / "02_System_Architecture.png"))
+    for s_name in ["handwritten_tehsil_cert.png", "clear_dummy_doc.png", "blurry_dummy_doc.png"]:
+        src = BASE_DIR / "data" / "test_samples" / s_name
+        if src.exists():
+            shutil.copy(str(src), str(assets_dir / s_name))
 
     # 5. Pack ZIP (Max 20MB)
     zip_path = BASE_DIR / "JanSetu_AI_Submission.zip"
     with zipfile.ZipFile(str(zip_path), "w", zipfile.ZIP_DEFLATED) as zipf:
-        for file_path in SUBMISSION_DIR.glob("*.*"):
-            zipf.write(file_path, arcname=f"JanSetu_AI_Submission/{file_path.name}")
+        for root, dirs, files in os.walk(str(SUBMISSION_DIR)):
+            for f in files:
+                full_path = Path(root) / f
+                arc_name = full_path.relative_to(SUBMISSION_DIR.parent)
+                zipf.write(str(full_path), str(arc_name))
+
+    zip_size_mb = os.path.getsize(str(zip_path)) / (1024 * 1024)
+    print(f"\n=======================================================")
+    print(f"SUCCESS: Created submission ZIP at: {zip_path}")
+    print(f"Total Package Size: {zip_size_mb:.2f} MB (Well under 20MB limit!)")
+    print(f"=======================================================")
 
     zip_size_mb = os.path.getsize(str(zip_path)) / (1024 * 1024)
     print(f"\n=======================================================")
