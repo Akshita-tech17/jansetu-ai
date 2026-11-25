@@ -1,0 +1,61 @@
+================================================================================
+🏛️ JanSetu AI — Hackathon Submission & Judge Navigation Guide
+================================================================================
+Event: AI Kaushal Hackathon (IIIT Lucknow)
+Track: Vernacular Citizen Services Assistant (Uttar Pradesh)
+Team Name: JanSetu AI Team
+Live GitHub Repository: https://github.com/Akshita-tech17/jansetu-ai
+================================================================================
+
+👋 Welcome Judges!
+This submission is structured so you can evaluate the entire working solution
+in under 2 minutes without digging through deep code folders.
+
+--------------------------------------------------------------------------------
+📂 FILE NAVIGATION (How this ZIP is structured):
+--------------------------------------------------------------------------------
+
+1. [01_JanSetu_AI_Solution_Brief.pdf]  <--- ⭐ START HERE (MAIN DOCUMENT)
+   • 5-slide Executive Solution Brief in landscape format.
+   • Covers the Problem, our 3 Core DPI Pillars, Architecture Stack,
+     and Real-World UP Impact (25 mins -> 90 secs).
+
+2. [02_System_Architecture.png]        <--- 🖼️ HIGH-RES ARCHITECTURE DIAGRAM
+   • Crisp 1920x1080 visual diagram showing the 4 end-to-end layers:
+     (1) Vernacular Citizen UI (Awadhi/Bhojpuri/Urdu)
+     (2) UP Family ID (4 Cr dataset) & Proactive 98-Scheme Discovery
+     (3) Vision Guard (Laplacian Blur & Handwritten Tehsil Stamp OCR)
+     (4) Direct e-District Filing & 15-Day Janhit Guarantee SLA.
+
+3. [03_PoC_Demo_Video.mp4]             <--- 🎥 60-90s WORKING DEMO RECORDING
+   • Live screen capture showing 1-click Family ID discovery, Awadhi voice,
+     handwritten certificate verification, and final application filing.
+
+4. [04_Sample_Official_eDistrict_Receipt.pdf] <-- 📄 REAL GENERATED OUTPUT
+   • Actual government application submission acknowledgment receipt generated
+     by the system with Application Ref (UP-EDIST-2026-XXXX) and legal SLA date.
+
+5. [diagrams_and_test_assets/]         <--- 📁 SUPPORTING VISUAL ASSETS
+   • Contains raw sample documents used for testing:
+     - 02_System_Architecture.png (High-Res architecture diagram)
+     - handwritten_tehsil_cert.png (Handwritten revenue certificate with official seal)
+     - clear_dummy_doc.png (Crisp verified Aadhaar)
+     - blurry_dummy_doc.png (Intentionally blurred doc flagged by Laplacian guard)
+
+--------------------------------------------------------------------------------
+💡 WHAT MAKES JANSETU AI UNIQUE (Executive Summary):
+--------------------------------------------------------------------------------
+• The Anchor: Links directly to UP's existing Family ID (एक परिवार, एक पहचान).
+• Proactive, Not Reactive: Citizen doesn't ask "what scheme do I get?".
+  The assistant auto-evaluates the household and speaks in vernacular voice:
+  "Rameshwar ji, your family is eligible for Rs. 52,000/yr across 4 schemes!"
+• Handwriting & Scan OCR: Reads handwritten Tehsil income certificates and Khatauni.
+• Ending in Something Filed: Submits to e-District DPI and returns legal receipt.
+
+--------------------------------------------------------------------------------
+🚀 TO RUN THE LIVE WORKING CODE ON ANY LAPTOP:
+--------------------------------------------------------------------------------
+1. git clone https://github.com/Akshita-tech17/jansetu-ai
+2. cd jansetu-ai && run.bat
+3. Opens http://localhost:8000 (Split-screen Citizen UI + Judge AI Inspector).
+================================================================================
