@@ -1,8 +1,10 @@
 @echo off
+cd /d "%~dp0"
 echo ========================================================
 echo   Starting JanSetu AI Prototype (AI Kaushal Hackathon)
 echo ========================================================
 echo.
+echo Current Directory: %CD%
 echo Local URL: http://localhost:8000
 echo Opening JanSetu AI Split-Screen in browser...
 start http://localhost:8000
